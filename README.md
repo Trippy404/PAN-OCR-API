@@ -263,16 +263,7 @@ F:\project_yolo\best.pt
 
 ---
 
-## 📈 Business Model
 
-| Plan | Price | API Calls |
-|------|-------|-----------|
-| Free | ₹0 | 100/month |
-| Starter | ₹999/month | 5000/month |
-| Business | ₹4999/month | 50000/month |
-| Enterprise | Custom | Unlimited |
-
----
 
 ## 👨‍💻 Author
 
