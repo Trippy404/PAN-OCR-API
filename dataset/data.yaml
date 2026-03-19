@@ -1,0 +1,10 @@
+path: dataset
+
+train: images/train
+val: images/val
+
+names:
+  0: name
+  1: father_name
+  2: dob
+  3: pan_number

@@ -1,0 +1,10 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.cache
+runs/
+outputs/
+*.zip
+dataset/images/
+dataset/labels/
