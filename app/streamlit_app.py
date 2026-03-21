@@ -1,25 +1,26 @@
 # streamlit_app.py
-import sys
+# Full web UI for PAN Card OCR System
+
+
 import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+
+
+
 import json
-import platform
+import sys
 from pathlib import Path
 
 import streamlit as st
 from PIL import Image
-import pytesseract
 
-# Fix for OpenMP conflict
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+# Add project to Python path
+sys.path.insert(0, "F:/project_yolo")
 
-# Only set Tesseract path on Windows
-if platform.system() == "Windows":
-    pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-
-# Add project root to Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.pipeline import PANPipeline  # single import
+from src.pipeline import PANPipeline
 
 # ── Page settings ─────────────────────────────────────────────
 st.set_page_config(
@@ -164,15 +165,6 @@ with tab1:
         elif uploaded and run:
             with st.spinner("Processing..."):
                 try:
-                    # DEBUG — check tesseract installation
-                    import subprocess
-                    result_cmd = subprocess.run(["which", "tesseract"], capture_output=True, text=True)
-                    st.write("Tesseract path:", result_cmd.stdout)
-                    result_cmd2 = subprocess.run(["tesseract", "--version"], capture_output=True, text=True)
-                    st.write("Tesseract version:", result_cmd2.stdout or result_cmd2.stderr)
-
-                    # Load pipeline
-                    pipeline = load_pipeline()
                     # Load pipeline
                     pipeline = load_pipeline()
 
@@ -181,27 +173,6 @@ with tab1:
                         image,
                         source_filename=uploaded.name
                     )
-
-                                        # TEMPORARY DEBUG — ADD RIGHT HERE ↓
-                    st.subheader("🔬 Raw Tesseract Debug")
-                    import cv2
-                    import numpy as np
-                    import pytesseract
-
-                    cv_img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-                    for det in result["detections"]:
-                        x1, y1, x2, y2 = [int(v) for v in det["bbox"]]
-                        crop = cv_img[y1:y2, x1:x2]
-                        st.write(f"**Field: {det['label']}**")
-                        st.image(crop, caption=f"{det['label']} crop", width=300)
-                        raw = pytesseract.image_to_string(crop, config="--psm 7 --oem 3")
-                        st.write(f"Raw text: `{repr(raw)}`")
-                    # DEBUG END ↑
-
-                    st.subheader("🔍 Debug Info")  # ← your existing line
-
-
-
 
                     output     = result["output"]
                     detections = result["detections"]

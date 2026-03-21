@@ -1,17 +1,15 @@
 # tesseract_ocr.py
+import platform
 import re
 import cv2
 import numpy as np
 import pytesseract
 from PIL import Image
 
+
 # Set Tesseract path for Windows
 # pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 
-import os
-import platform
-
-# Only set path on Windows
 if platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 
@@ -19,8 +17,13 @@ if platform.system() == "Windows":
 class TesseractOCR:
 
     def read_field(self, image: np.ndarray, field: str) -> str:
+        """
+        Read text from a cropped field image
+        Tries multiple methods and returns best result
+        """
         results = []
 
+        # Try all preprocessing methods
         for method in [1, 2, 3, 4]:
             try:
                 processed = self._preprocess(image, method)
@@ -34,25 +37,19 @@ class TesseractOCR:
         if not results:
             return ""
 
+        # For PAN number return the one matching PAN pattern
         if field == "pan_number":
             for r in results:
                 if re.match(r"[A-Z]{5}[0-9]{4}[A-Z]", r):
                     return r
 
+        # For DOB return the one with date pattern
         if field == "dob":
             for r in results:
                 if re.search(r"\d{2}/\d{2}/\d{4}", r):
                     return r
 
-        return self._best_result(results, field)
-
-    def _best_result(self, results: list, field: str) -> str:
-        if not results:
-            return ""
-        if field in ["name", "father_name"]:
-            valid = [r for r in results if re.match(r'^[A-Za-z\s]+$', r.strip())]
-            if valid:
-                return max(valid, key=len)
+        # For names return longest result
         return max(results, key=len)
 
     def _preprocess(self, image: np.ndarray, method: int) -> np.ndarray:
