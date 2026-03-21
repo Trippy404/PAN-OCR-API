@@ -173,9 +173,25 @@ with tab1:
                         source_filename=uploaded.name
                     )
 
-                    st.subheader("🔍 Debug Info")
-                    st.write("**Detections found:**", result["detections"])
-                    st.write("**Raw OCR results:**", result["output"])
+                                        # TEMPORARY DEBUG — ADD RIGHT HERE ↓
+                    st.subheader("🔬 Raw Tesseract Debug")
+                    import cv2
+                    import numpy as np
+                    import pytesseract
+
+                    cv_img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+                    for det in result["detections"]:
+                        x1, y1, x2, y2 = [int(v) for v in det["bbox"]]
+                        crop = cv_img[y1:y2, x1:x2]
+                        st.write(f"**Field: {det['label']}**")
+                        st.image(crop, caption=f"{det['label']} crop", width=300)
+                        raw = pytesseract.image_to_string(crop, config="--psm 7 --oem 3")
+                        st.write(f"Raw text: `{repr(raw)}`")
+                    # DEBUG END ↑
+
+                    st.subheader("🔍 Debug Info")  # ← your existing line
+
+
 
 
                     output     = result["output"]
