@@ -164,6 +164,15 @@ with tab1:
         elif uploaded and run:
             with st.spinner("Processing..."):
                 try:
+                    # DEBUG — check tesseract installation
+                    import subprocess
+                    result_cmd = subprocess.run(["which", "tesseract"], capture_output=True, text=True)
+                    st.write("Tesseract path:", result_cmd.stdout)
+                    result_cmd2 = subprocess.run(["tesseract", "--version"], capture_output=True, text=True)
+                    st.write("Tesseract version:", result_cmd2.stdout or result_cmd2.stderr)
+
+                    # Load pipeline
+                    pipeline = load_pipeline()
                     # Load pipeline
                     pipeline = load_pipeline()
 
