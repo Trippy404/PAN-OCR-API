@@ -1,35 +1,25 @@
 # streamlit_app.py
-# Full web UI for PAN Card OCR System
-
 import sys
 import os
-
-# Add the root directory to Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.pipeline import PANPipeline
-
-
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
-import pytesseract
-pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-
-import os
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
 import json
-import sys
+import platform
 from pathlib import Path
 
 import streamlit as st
 from PIL import Image
+import pytesseract
 
-# Add project to Python path
-sys.path.insert(0, "F:/project_yolo")
+# Fix for OpenMP conflict
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-from src.pipeline import PANPipeline
+# Only set Tesseract path on Windows
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+
+# Add project root to Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.pipeline import PANPipeline  # single import
 
 # ── Page settings ─────────────────────────────────────────────
 st.set_page_config(
@@ -182,6 +172,11 @@ with tab1:
                         image,
                         source_filename=uploaded.name
                     )
+
+                    st.subheader("🔍 Debug Info")
+                    st.write("**Detections found:**", result["detections"])
+                    st.write("**Raw OCR results:**", result["output"])
+
 
                     output     = result["output"]
                     detections = result["detections"]
